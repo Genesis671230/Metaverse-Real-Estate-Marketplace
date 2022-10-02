@@ -13,7 +13,7 @@ function Layout(props) {
     <div className='w-full bg-white h-screen flex flex-row justify-around fixed top-0 left-0 right-0 bottom-0 ' >
       <div className='md:w-52 h-screen bg-white border-r border-temp-[#fafafa]' >
         <div className='h-16 px-4 flex flex-row w-full justify-between items-center' >
-            <Link to="/home">
+            <Link to="/">
             <span className='font-extrabold text-base text-temp-red block' >
                 B
             </span>
@@ -22,7 +22,7 @@ function Layout(props) {
                 <span className='w-6 h-6 flex justify-center items-center'>
                     <IconContext.Provider value={{ color: "#000"}}>
                         <div>
-                            <Link to="/home">
+                            <Link to="/">
                         <HiOutlineMenuAlt3/>
                             </Link>
                         </div>
@@ -34,7 +34,7 @@ function Layout(props) {
             <div  >
                 <a className='cursor-pointer block mb-3' >
                     <div className='px-4 py-3 bg-white group hover:bg-temp-gray2 flex flex-row justify-center w-full border-b border-t items-center ' >
-                        <Link to="/home">
+                        <Link to="/">
                         <span className='hover:text-white  group-hover:text-white text-temp-gray2 font-normal text-sm mr-2' >Website</span>
                         </Link>
                         <span className='flex justify-center items-center '>
