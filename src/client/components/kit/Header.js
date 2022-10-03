@@ -18,7 +18,9 @@ function Header() {
                 </Link>
             </a>
             <a>
+                <Link to="/login">
                 <span className='bg-temp-red text-white  px-9 rounded-full py-3 text-base font-semibold whitespace-nowrap' > Sign Up</span>
+                </Link>
             </a>
         </div>
         :

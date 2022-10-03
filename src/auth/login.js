@@ -2,12 +2,18 @@ import React, { useContext, useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
-import { MdAlternateEmail, MdPassword } from "react-icons/md";
+import { MdAlternateEmail, MdArrowBack, MdPassword } from "react-icons/md";
 import Loader from "../layout/Loader";
 import { auth } from "../api/firebase";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../states/user_context";
+import { toast, ToastContainer } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
   const [userEmail, setUserEmail] = useState("");
@@ -31,6 +37,8 @@ function Login() {
         navigate("/client");
       })
       .catch((error) => {
+        notify();
+        
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorMessage);
@@ -52,8 +60,37 @@ function Login() {
       });
   };
 
+  const notify = () =>
+    toast.error("Incorrect email or password!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+
   return (
     <div className="relative">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      {/* Same as */}
+      <ToastContainer />
+      <Link to="/">
+        <div className="p-5">
+          <MdArrowBack />
+        </div>
+      </Link>
       {showLoader && (
         <div className="absolute left-0 right-0 top-0 bottom-0 ">
           {" "}
@@ -98,7 +135,9 @@ function Login() {
           <div className="w-full mt-6">
             <input
               type="submit"
-              onClick={() => loginUser()}
+              onClick={() => {
+                loginUser();
+              }}
               className="bg-black cursor-pointer hover:bg-slate-800 text-white w-full h-10 font-bold"
               value="Login"
             />
@@ -131,7 +170,6 @@ function Login() {
               </span>
             </span>
           </a>
-          
         </div>
         <div></div>
       </div>
