@@ -36,7 +36,7 @@ const TourDetails = () => {
         <PanoramaPanillum img={tourDetails} />
       </div>
       <div className="bg-purple-700  ">
-        <div className="p-5 pb-5  md:text-[3rem] shadow-sm min-h-screen     backdrop-blur-sm bg-white ">
+        <div className="p-5 pb-5  md:text-[3rem] shadow-sm min-h-screen text-black  backdrop-blur-sm bg-white ">
           <div className="my-5 xs:text-xl font-bold ">
             <p>{tourDetails?.title}</p>
           </div>

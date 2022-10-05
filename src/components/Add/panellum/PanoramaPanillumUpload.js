@@ -113,7 +113,7 @@ function PanoramaPanillumUpload({
                   Add Hotspot
                 </button>
               </div>
-              <div className="flex gap-5">
+              <div className="flex gap-5 text-black">
                 connect To{" "}
                 {linkedHotpsotCounter.map((item, index) => {
                   return (
@@ -131,7 +131,7 @@ function PanoramaPanillumUpload({
               </div>
               <div>
                 {num.map((item) => (
-                  <div className="p-5 ">
+                  <div className="p-5 text-black">
                     <div className="">Id: {item.id}</div>
                     <div>Linked Scene: {item.linkedScene}</div>
                     <div>Pitch: {Math.floor(item.pitch)}</div>
