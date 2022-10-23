@@ -19,7 +19,6 @@ function Uploads() {
   const [uploadImg, setuploadImg] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [createObjectURL, setCreateObjectURL] = useState(null);
   const { datas, setDatas } = useContext(PanoramaContext);
   const [fileType, setfileType] = useState(1);
   const [open, setOpen] = useState(false);
@@ -28,7 +27,11 @@ function Uploads() {
     []
   );
   const [addHotspot, setAddHotspot] = useState([]);
+  const [activeParanoma, setActiveParanoma] = useState(0);
+  const [initialView, setInitialView] = useState([]);
 
+
+console.log(initialView,"this is initalview")
   const working = async () => {
     if (uploadImg) {
       setOpen(true);
@@ -47,8 +50,9 @@ function Uploads() {
               filename: listImg.name,
             });
             const passCheckpoint = !!paranomaImageDataToSanity.filter(
-              (item) => item.id == uploadImg.indexOf(listImg)
+              (item) => item.id === uploadImg.indexOf(listImg)
             );
+            const initialViewPosition = initialView.find((item)=>item.id === uploadImg.indexOf(listImg))
 
             if (passCheckpoint) {
               const doc = {
@@ -62,6 +66,9 @@ function Uploads() {
                 },
 
                 title: "shan",
+                pitch:initialViewPosition?.pitch,
+                yaw:initialViewPosition?.yaw,
+                hfov:initialViewPosition?.hfov,
                 hotspotsposition: paranomaImageDataToSanity.filter(
                   (item) => item.id == uploadImg.indexOf(listImg)
                 ),
@@ -111,8 +118,13 @@ function Uploads() {
 
   const removeImgFromArr = (index) => {
     const newArr = uploadImg.filter((prev, indexItem) => indexItem !== index);
+    const newInitialViews = initialView.filter((item)=>item.id !== index); 
+    setInitialView(newInitialViews);
     setuploadImg(newArr);
-    if (uploadImg.length == 1) setParanomaImageDataToSanity([]);
+    if (uploadImg.length == 1){
+       setParanomaImageDataToSanity([]);
+         setInitialView([])
+        };
 
     if (paranomaImageDataToSanity?.length > 0) {
       const newParanomaImageData = paranomaImageDataToSanity.filter(
@@ -125,7 +137,7 @@ function Uploads() {
     setAddHotspot(newHotspotArr);
   };
 
-  console.log(uploadImg, addHotspot, paranomaImageDataToSanity);
+  console.log(uploadImg, addHotspot, paranomaImageDataToSanity,initialView);
   return (
     <>
       <div className="mt-4">
@@ -159,27 +171,7 @@ function Uploads() {
       </div>
 
       <div className="mt-4">
-        {uploadImg.map((item, index) => (
-          <div className="p-10">
-            <button
-              className="px-5 py-3 rounded-sm bg-slate-500 my-5"
-              onClick={() => removeImgFromArr(index)}
-            >
-              Remove
-            </button>
-            <PanoramaPanillumUpload
-              addHotspot={addHotspot}
-              uploadImg={uploadImg}
-              index={index}
-              paranomaForUploading={item}
-              paranomaImageDataToSanity={paranomaImageDataToSanity}
-              setParanomaImageDataToSanity={setParanomaImageDataToSanity}
-            />
-
-            
-          </div>
-        ))}
-
+       
         <span className="text-base font-medium text-temp-gray">
           ADD PANORAMA PICTURE
         </span>
@@ -216,13 +208,14 @@ function Uploads() {
           </div>
         </div>
         {fileType != 2 && (
-          <div className="mt-3 w-full h-80 p-4 bg-[#eee]">
-            <div className="w-full h-full flex items-center justify-center ">
-              <label htmlFor="upload-photo">
-                <a className=" cursor-pointer hover:bg-[#e6e6e6] w-60 bg-[#e6e6e680] h-40 text-temp-gray flex items-center justify-center">
-                  Click to upload
-                </a>
+          <div className="mt-3  rounded-2xl flex relative  w-full h-full p-4 bg-[#eee]">
+            <div className=" border-tl-2 rounded-tl-3xl flex-1 min-h-[568px] max-h-[568px] flex flex-col   bg-[#94979b]   border-r-cyan-200 border-r-2 pt-6  ">
+              <label htmlFor="upload-img" className="w-full">
+                <div className="whitespace-nowrap bg-[#2693ff] w-full mb-5 px-10 py-2 text-white text-center  hover:bg-[#e6e6e6]  hover:text-black ">
+                  Load paranoma
+                </div>
               </label>
+
               <input
                 onChange={(e) => {
                   setuploadImg((prev) => [
@@ -231,9 +224,39 @@ function Uploads() {
                   ]);
                   console.log("this should work", uploadImg && uploadImg);
                 }}
+                className="opacity-0"
                 type="file"
-                id="upload-photo"
+                id="upload-img"
               />
+              <div>
+              {uploadImg.map((item,index)=>(
+                <div className="w-full cursor-pointer flex justify-center text-white my-3 py-3 bg-slate-600" onClick={()=>setActiveParanoma(index)}>{index}</div>
+              ))}
+              </div>
+            </div>
+            <div className="w-full h-full flex flex-3 flex-col  overflow-y-scroll  items-start justify-center ">
+              {uploadImg.map((item, index) => {
+                if(activeParanoma !== index) return;
+                
+                return (
+                <div className="w-full h-auto  relative">
+                  <button
+                    className="px-5 py-2 font-bold text-white  absolute top-4 right-10 z-10  rounded-lg bg-red-800 "
+                    onClick={() => removeImgFromArr(index)}
+                  >
+                    Remove
+                  </button>
+                  <PanoramaPanillumUpload
+                    addHotspot={addHotspot}
+                    uploadImg={uploadImg}
+                    index={index}
+                    setInitialView={setInitialView}
+                    paranomaForUploading={item}
+                    paranomaImageDataToSanity={paranomaImageDataToSanity}
+                    setParanomaImageDataToSanity={setParanomaImageDataToSanity}
+                  />
+                </div>
+              )})}
             </div>
           </div>
         )}

@@ -17,6 +17,21 @@ export default {
         type: 'string',
       },
       {
+        name: 'pitch',
+        title: 'Pitch',
+        type: 'number',
+    },
+    {
+        name: 'yaw',
+        title: 'Yaw',
+        type: 'number',
+    },
+    {
+        name: 'hfov',
+        title: 'Hfov',
+        type: 'number',
+    },
+      {
         name: 'hotspotsposition',
         title: 'Hotspots position',
         type: 'array',

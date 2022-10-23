@@ -3,11 +3,17 @@ import myImage from "./milan.jpg";
 import r1 from "./images/r1.jpg";
 import { useEffect, useRef, useState } from "react";
 import { createObjectURL } from "blob-util";
-
+import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import { motion, useDragControls } from "framer-motion";
+import HiveIcon from "@mui/icons-material/Hive";
+import CheckboxList from "./CheckboxList";
+import NavigationIcon from "@mui/icons-material/Navigation";
+import SelectedHotspotList from "./SelectedHotspotList";
 function PanoramaPanillumUpload({
   index,
   uploadImg,
   addHotspot,
+  setInitialView,
   paranomaForUploading,
   paranomaImageDataToSanity,
   setParanomaImageDataToSanity,
@@ -16,6 +22,9 @@ function PanoramaPanillumUpload({
   const [paranomaCheckbox, setParanomaCheckbox] = useState();
   const [linkedHotpsotCounter, setLinkedHotpsotCounter] = useState();
   const [singleHotspotLink, setSingleHotspotLink] = useState(0);
+ 
+  const currentDate = new Date();
+
   const PanRef = useRef();
   useEffect(() => {
     if (paranomaForUploading) {
@@ -23,9 +32,8 @@ function PanoramaPanillumUpload({
       setImgUrl(img);
     }
   }, [paranomaForUploading]);
-  const num = paranomaImageDataToSanity?.filter((item) => item.id == index);
+  const num = paranomaImageDataToSanity?.filter((item) => item.id === index);
   const getLength = num?.length;
-  // console.log(getLength && getLength, "this is greSt");
   useEffect(() => {
     const specificItem = uploadImg.map(
       (item, itemIndex) => itemIndex !== index && itemIndex
@@ -35,112 +43,136 @@ function PanoramaPanillumUpload({
     setLinkedHotpsotCounter(filterFine);
   }, [uploadImg]);
 
-
-
   console.log(paranomaCheckbox);
   return (
     <div>
       {imgUrl && (
         <div>
-          <Pannellum
-            ref={PanRef}
-            width="100%"
-            height="500px"
-            image={imgUrl}
-            pitch={10}
-            yaw={180}
-            hfov={110}
-            autoLoad
-            showZoomCtrl={false}
-            autoRotate={5}
-            autoRotateInactivityDelay={100}
-            compass={true}
-            sceneFadeDuration={100}
-            onLoad={() => console.log("panorama loaded")}
-            onError={(err) => {
-              console.log("Error", err);
-            }}
-            onErrorcleared={() => {
-              console.log("Error Cleared");
-            }}
-            onMouseup={() => {
-              console.log(
-                PanRef.current.getViewer().getPitch(),
-                PanRef.current.getViewer().getYaw(),
-                PanRef.current.getViewer().getHfov(),
-              );
-              const currentDate = new Date();
-              setParanomaCheckbox({
-                _key: currentDate.getTime(),
-                linkedScene: singleHotspotLink,
-                id: index,
-                pitch: PanRef.current.getViewer().getPitch(),
-                yaw: PanRef.current.getViewer().getYaw(),
-                hfov: PanRef.current.getViewer().getHfov(),
-              });
-            }}
-            onTouchstart={(evt) => {
-              console.log("Touch Start", singleHotspotLink, evt);
-            }}
-            onTouchend={(evt) => {
-              console.log("Touch End", evt);
-            }}
-            onScenechangefadedone={() => {
-              console.log("panorama loaded");
+          <div className="relative">
+            <Pannellum
+              ref={PanRef}
+              width="100%"
+              height="568px"
+              image={imgUrl}
+              pitch={10}
+              yaw={180}
+              hfov={110}
+              autoLoad
+              showFullscreenCtrl={false}
+              showZoomCtrl={false}
+              autoRotate={5}
+              autoRotateInactivityDelay={100}
+              compass={true}
+              sceneFadeDuration={100}
+              onLoad={() => console.log("panorama loaded")}
+              onError={(err) => {
+                console.log("Error", err);
+              }}
+              onErrorcleared={() => {
+                console.log("Error Cleared");
+              }}
+              onMouseup={() => {}}
+              onTouchstart={(evt) => {}}
+              onTouchend={(evt) => {}}
+              onScenechangefadedone={() => {
+                console.log("panorama loaded");
+              }}
+            ></Pannellum>
+          </div>
+
+          <div className="absolute right-[200px] top-4   text-sm rounded-md text-white cursor-pointer bg-slate-400">
+            <SelectedHotspotList num={num}/>
+              </div>
+          <div
+            className="absolute right-[400px] top-4 px-4 py-2 text-sm rounded-md text-white cursor-pointer bg-slate-400"
+            onClick={() => {
+              if (PanRef.current.getViewer()) {
+                setInitialView((prev) => {
+                  const present = prev.find((item) => item.id === index);
+                  const presentIndex = prev.findIndex(
+                    (item) => item.id === index
+                  );
+
+                  if (!!present) {
+                    prev.splice(presentIndex, 1);
+                    return [
+                      ...prev,
+                      {
+                        id: index,
+                        pitch: PanRef.current.getViewer().getPitch(),
+                        yaw: PanRef.current.getViewer().getYaw(),
+                        hfov: PanRef.current.getViewer().getHfov(),
+                      },
+                    ];
+                  } else {
+                    return [
+                      ...prev,
+                      {
+                        id: index,
+                        pitch: PanRef.current.getViewer().getPitch(),
+                        yaw: PanRef.current.getViewer().getYaw(),
+                        hfov: PanRef.current.getViewer().getHfov(),
+                      },
+                    ];
+                  }
+                });
+              }
             }}
           >
-            <Pannellum.Hotspot
-              type="info"
-              pitch={11}
-              yaw={-167}
-              text="Info Hotspot Text 3"
-              URL="https://github.com/farminf/pannellum-react"
-            />
-          </Pannellum>
+            <div className="flex gap-5 text-black items-center">
+              <RemoveRedEyeOutlinedIcon />
+              <p> Initial View</p>
+            </div>
+            
+          </div>
+
           {uploadImg?.length > 1 && (
-            <div>
+            <motion.div
+              drag
+              dragConstraints={{ left: 20, right: 1020, top: 0, bottom: 400 }}
+              dragElastic={0.1}
+              onDragEnd={(event, info) => {
+                setParanomaCheckbox({
+                  _key: currentDate.getTime(),
+                  linkedScene: singleHotspotLink,
+                  id: index,
+                  pitch: PanRef.current.getViewer().getPitch(),
+                  yaw: PanRef.current.getViewer().getYaw(),
+                  hfov: PanRef.current.getViewer().getHfov(),
+                });
+
+                console.log(
+                  PanRef.current.getViewer().getPitch(),
+                  PanRef.current.getViewer().getYaw(),
+                  PanRef.current.getViewer().getHfov()
+                );
+              }}
+              dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
+              className="absolute left-12 top-0"
+            >
               <div>
-                <button
-                  onClick={() => {
-                    if (getLength == uploadImg?.length - 1) return;
-                    setParanomaImageDataToSanity((prev) => [
-                      ...prev,
-                      paranomaCheckbox,
-                    ]);
-                  }}
-                  className="p-5 bg-blue-400  my-3 rounded-md "
-                >
-                  Add Hotspot
+                <button className="p-2 px-5 bg-blue-400 relative my-3 rounded-full h-10 flex items-center justify-center w-10">
+                  {paranomaCheckbox?.linkedScene ? (
+                    <div   onClick={() => {
+                      if (getLength === uploadImg?.length - 1) return;
+                      setParanomaImageDataToSanity((prev) => [
+                        ...prev,
+                        paranomaCheckbox,
+                      ]);
+                    }}
+                     className="absolute w-5 h-5 -bottom-5 -right-8 hover:border-2 hover:rounded-full flex items-center justify-center hover:p-4 hover:border-fuchsia-800 ">
+                      <NavigationIcon />
+                    </div>
+                  ):null}
+                  <div className="absolute w-5 h-5 -bottom-5 -left-8">
+                    <CheckboxList setParanomaCheckbox={setParanomaCheckbox} linkedHotpsotCounter={linkedHotpsotCounter} />
+                  </div>
+                  <HiveIcon />
                 </button>
               </div>
-              <div className="flex gap-5 text-black">
-                connect To{" "}
-                {linkedHotpsotCounter.map((item, index) => {
-                  return (
-                    <div>
-                      <input
-                        onChange={() => setParanomaCheckbox((prev)=>({...prev,linkedScene:Number(item)}))}
-                        type="checkbox"
-                        name="1"
-                        id={item.toString()}
-                      />
-                      <p>{item}</p>
-                    </div>
-                  );
-                })}
-              </div>
-              <div>
-                {num.map((item) => (
-                  <div className="p-5 text-black">
-                    <div className="">Id: {item.id}</div>
-                    <div>Linked Scene: {item.linkedScene}</div>
-                    <div>Pitch: {Math.floor(item.pitch)}</div>
-                    <div>Yaw: {Math.floor(item.yaw)}</div>
-                    <div>Hfov: {Math.floor(item.hfov)}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+
+           
+            </motion.div>
           )}
         </div>
       )}

@@ -20,7 +20,7 @@ function Add() {
   }, []);
 
   return (
-    <div>
+    <div className="px-10">
       <MapView />
       <SearchBar />
       <TransactionType />

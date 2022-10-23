@@ -24,16 +24,15 @@ function PanoramaPanillum({ img }) {
             width="auto"
             height="80vh"
             image={urlFor(imagesArr.at(currentIndex)?.image).url()}
-            pitch={10}
-            yaw={180}
-            hfov={110}
+            pitch={imagesArr.at(currentIndex)?.pitch}
+            yaw={imagesArr.at(currentIndex)?.yaw}
+            hfov={imagesArr.at(currentIndex)?.hfov}
             showFullscreenCtrl={false}
             autoLoad
             showZoomCtrl={false}
             autoRotate={5}
             autoRotateInactivityDelay={100}
             compass={true}
-            previewTitle="king"
             sceneId="pakistan1"
             sceneFadeDuration={100}
             onLoad={() => {
@@ -48,7 +47,7 @@ function PanoramaPanillum({ img }) {
                 yaw={item.yaw}
                 hfov={item.hfov}
                 handleClick={(evt, args) => {
-                  setCurrentIndex(item.linkedScene);
+                  setCurrentIndex(item?.linkedScene);
                 }}
                 handleClickArg={{ name: currentIndex }}
               />
