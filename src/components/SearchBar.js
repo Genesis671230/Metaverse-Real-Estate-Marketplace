@@ -7,8 +7,8 @@ import { ViewPortContext } from "../states/viewport_context";
 function SearchBar() {
   const [focus, setFocus] = useState(false);
   const [values, setValues] = useState([]);
-const [street, setstreet] = useState();
-const [StreeNumber, setStreetNumber] = useState();
+  const [street, setstreet] = useState();
+  const [StreeNumber, setStreetNumber] = useState();
   const { viewport, setViewport } = useContext(ViewPortContext);
   const { datas, setDatas } = useContext(PanoramaContext);
 
@@ -39,14 +39,14 @@ const [StreeNumber, setStreetNumber] = useState();
           ],
         });
         setFocus(false);
-          setViewport({
-            ...viewport,
-            latitude: item.geometry.coordinates[1],
-            longitude: item.geometry.coordinates[0],
-            zoom: 30.5,
-            bearing: 70,
-            pitch: 40,
-          });
+        setViewport({
+          ...viewport,
+          latitude: item.geometry.coordinates[1],
+          longitude: item.geometry.coordinates[0],
+          zoom: 30.5,
+          bearing: 70,
+          pitch: 40,
+        });
       }}
       className="cursor-pointer"
       key={index}

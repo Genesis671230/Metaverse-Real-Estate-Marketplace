@@ -11,10 +11,8 @@ function Room2({ itemData,snImg }) {
     if (itemData) {
       const res = itemData.image[0]?.image;
       setImgFront(res);
-      console.log(res,snImg);
     }
   }, []);
-  console.log(itemData);
   return (
     <div className="bg-white w-[270px]  border border-[#00000017] ">
       {imgFront && (

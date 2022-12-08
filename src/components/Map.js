@@ -7,6 +7,8 @@ function MapView() {
 
   const {viewport, setViewport} = useContext(ViewPortContext);
   const [isBrowser, setIsBrowser] = useState(false);
+
+  
   const initialViewState = {
     latitude: 37.7751,
     longitude: -122.4193,
@@ -51,7 +53,7 @@ function MapView() {
                       latitude={viewport.latitude}>
                         <span className='block w-5 h-5 ' >
                           <img
-                            src={require("../pin.png")}
+                            src={require("../assets/pin.png")}
                             style={{
                               width: 20,
                               height: 30,

@@ -177,3 +177,63 @@ label {
     filter: invert(1);
   }
 }
+
+.cssCustomArrow{
+  width: 0;
+	height: 0;
+	border-width: 0 18px 35px 18px;
+	border-color: transparent transparent #751131 transparent;
+	border-style: solid;
+	filter: drop-shadow(0px 10px 0px rgba(15, 19, 61, 0.92));
+}
+.cssCustomArrow:hover{
+  border-color: transparent transparent #2178d0 transparent;
+  filter: drop-shadow(0px 0px 0px rgba(15, 19, 61, 0.92));
+}
+.hotspot .in{
+  visibility: hidden;
+}
+.hotspot .out{
+  visibility: hidden;
+}
+
+.pnlm-hotspot.pnlm-info{
+  visibility: hidden;
+  background-color: #751131;
+  color: white;
+}
+
+.pnlm-tooltip{
+  position: relative;
+}
+.pnlm-tooltip:hover span{
+  display: none;
+  visibility: visible;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 12px;
+  padding: 20px;
+  color: white;
+  top: -40px;
+}
+
+.pnlm-tooltip:hover .dynamic-tooltip{
+  visibility: visible;
+}
+.dynamic-tooltip{
+  border-radius: 12px;
+   transition: all 0.3s ease-out;
+  /* visibility: hidden; */
+  position: absolute;
+  top: -10rem;
+  padding: 10px;
+  width: 10rem;
+  object-fit: contain;
+  background-position: center;
+  height: 8rem;
+}
+
+.dynamic-tooltip-img-box{
+  width: 500px;
+}

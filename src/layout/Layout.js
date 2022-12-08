@@ -49,6 +49,45 @@ function Layout(props) {
                 
             </div>
         </div>
+        <div className='my-4' >
+            <div  >
+                <a className='cursor-pointer block mb-3' >
+                    <div className='px-4 py-3 bg-white group hover:bg-temp-gray2 flex flex-row justify-center w-full border-b border-t items-center ' >
+                        <Link to="/client">
+                        <span className='hover:text-white  group-hover:text-white text-temp-gray2 font-normal text-sm mr-2' >Add Paranoma</span>
+                        </Link>
+                        <span className='flex justify-center items-center '>
+                            <IconContext.Provider value={{ color: "#fff"}}>
+                                <div>
+                                    <AiOutlineGlobal/>
+                                </div>
+                            </IconContext.Provider>
+                        </span>
+                    </div>
+                </a>
+                
+            </div>
+        </div>
+
+        <div className='my-4' >
+            <div  >
+                <a className='cursor-pointer block mb-3' >
+                    <div className='px-4 py-3 bg-white group hover:bg-temp-gray2 flex flex-row justify-center w-full border-b border-t items-center ' >
+                        <Link to="/edit">
+                        <span className='hover:text-white  group-hover:text-white text-temp-gray2 font-normal text-sm mr-2' >Edit</span>
+                        </Link>
+                        <span className='flex justify-center items-center '>
+                            <IconContext.Provider value={{ color: "#fff"}}>
+                                <div>
+                                    <AiOutlineGlobal/>
+                                </div>
+                            </IconContext.Provider>
+                        </span>
+                    </div>
+                </a>
+                
+            </div>
+        </div>
       </div>
       <div className='w-full h-screen ' >
         <div className='w-full h-16 bg-white  flex justify-end items-center px-3 ' >

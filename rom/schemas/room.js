@@ -62,6 +62,21 @@ export default {
               title: 'Hfov',
               type: 'number',
           },
+          {
+            name: 'hotspotType',
+            title: 'Hotspot type',
+            type: 'string',
+          },
+          {
+            name: 'url',
+            title: 'Url',
+            type: 'string',
+          },
+          {
+            name: 'hotspotDescription',
+            title: 'Hotspot description',
+            type: 'string',
+          },  
       ],
       }],
       },

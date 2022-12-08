@@ -2,14 +2,17 @@ import Layout from "./layout/Layout";
 import "./globals.css";
 import "./loader.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Add from "./Add";
-import Home from "./client/Home";
-import Login from "./auth/login";
 import { PanoramaContext } from "./states/panorama_context";
 import { useEffect, useState } from "react";
 import { ViewPortContext } from "./states/viewport_context";
 import { UserContextProvider } from "./states/user_context";
-import TourDetails from "./TourDetails";
+import Add from "./pages/Add";
+import Home from "./pages/Home";
+import Edit from "./pages/Edit";
+import EditParanoma from "./pages/EditParanoma";
+import Login from "./pages/Login";
+import TourDetails from "./pages/TourDetails";
+
 const App = () => {
   const [viewport, setViewport] = useState({});
   const [datas, setDatas] = useState({});
@@ -42,6 +45,8 @@ const App = () => {
                 }
               />
               <Route path="/" element={<Home />} />
+              <Route path="/edit" element={<Edit />} />
+              <Route path="/edit/:uid" element={<EditParanoma />} />
               <Route path="/login" element={<Login />} />
               <Route path="/tour/:id" element={<TourDetails />} />
             </Routes>
