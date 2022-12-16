@@ -89,7 +89,7 @@ function UploadsEdit() {
                   },
                 },
 
-                title: "shan",
+                title:  listImg.name,
                 pitch: initialViewPosition?.pitch,
                 yaw: initialViewPosition?.yaw,
                 hfov: initialViewPosition?.hfov,
@@ -103,8 +103,8 @@ function UploadsEdit() {
               setUploadedImagesLinks((prev) => [...prev, waitToGetUrl]);
             }
 
-            setOpen(false);
           }
+          setOpen(false);
           setuploadImg([]);
         };
         await runFunEach();

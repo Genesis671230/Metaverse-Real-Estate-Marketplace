@@ -92,7 +92,27 @@ function PanoramaPanillum({ img }) {
                           );
                           const root = ReactDOM.createRoot(dynamicTooltip[index]);
                            root.render(youtubeVideo, dynamicTooltip[index]);
-                        } else {
+                        } else if (hotspot.url.includes("files")) {
+                          const youtubeVideo = (
+                            <>
+                              <div className="w-[15.6rem] text-center bg-black">
+                                {hotspot.hotspotDescription}
+                              </div>
+                              <iframe
+                                frameborder="0"
+                                scrolling="no"
+                                marginheight="0"
+                                marginwidth="0"
+                                width="250"
+                                height="140"
+                                type="text/html"
+                                src={hotspot.url}
+                              ></iframe>
+                            </>
+                          );
+                          const root = ReactDOM.createRoot(dynamicTooltip[index]);
+                          root.render(youtubeVideo, dynamicTooltip[index]);
+                        }  else {
                           const newImg = (
                             <div
                             className="dynamic-tooltip-img-box"

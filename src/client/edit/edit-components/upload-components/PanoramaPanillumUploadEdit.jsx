@@ -10,7 +10,9 @@ import { urlFor } from "../../../../lib/utils";
 import CheckboxListEdit from "./CheckboxListEdit";
 import ReactDOM from "react-dom/client";
 import SelectedHotspotListEdit from "./SelectedHotspotListEdit";
-import { ArrowCircleDown, BlurOn, HelpOutline } from "@mui/icons-material";
+import { ArrowCircleDown, BlurOn, Check, CloudUpload, Delete, HelpOutline, InsertLink } from "@mui/icons-material";
+import { Backdrop, CircularProgress } from "@mui/material";
+import { useSanity } from "../../../../hooks/useSanity";
 
 function PanoramaPanillumUploadEdit({
   index,
@@ -23,16 +25,56 @@ function PanoramaPanillumUploadEdit({
   setParanomaImageDataToSanity,
 }) {
   const [imgUrl, setImgUrl] = useState();
+  const [open, setOpen] = useState(false);
+  const [uploadToSanity, setUploadToSanity] = useState();
   const [customHotspot, setCustomHotspot] = useState(true);
   const [infoHotspotUrl, setInfoHotspotUrl] = useState({});
   const [paranomaCheckbox, setParanomaCheckbox] = useState();
   const [singleHotspotLink, setSingleHotspotLink] = useState(0);
   const [linkedHotpsotCounter, setLinkedHotpsotCounter] = useState();
+  const [hotspotUploadSuccess, sethotspotUploadSuccess] = useState(false);
+  const [toggleUploadFilesType, setToggleUploadFilesType] = useState(true);
 
   const PanRef = useRef();
   const currentDate = new Date();
   const { editHotspots, editInfoHotspots } = useParanoma();
-  
+  const { uploadToGetLink } = useSanity();
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const uploadHotspotFileToSanity = async () => {
+    try {
+      setOpen(true);
+      const uploadedFile = await uploadToGetLink(uploadToSanity);
+
+      if (uploadedFile._type === "hotspotImages") {
+        setInfoHotspotUrl((prev) => ({
+          ...prev,
+          url: urlFor(uploadedFile?.image)?.url(),
+        }));
+        sethotspotUploadSuccess(true);
+      }
+
+      if (uploadedFile._type === "hotspotVideos") {
+        setInfoHotspotUrl((prev) => ({
+          ...prev,
+          url: uploadedFile?.url,
+        }));
+        sethotspotUploadSuccess(true);
+      }
+
+      setOpen(false);
+      setUploadToSanity([]);
+    } catch (error) {
+      console.log(error);
+      setOpen(false);
+      setUploadToSanity([]);
+    }
+  };
+
+
   useEffect(() => {
     if (
       paranomaForUploading &&
@@ -78,6 +120,13 @@ function PanoramaPanillumUploadEdit({
 
   return (
     <div>
+         <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={open}
+        onClick={handleClose}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -168,6 +217,26 @@ function PanoramaPanillumUploadEdit({
                         );
                         const root = ReactDOM.createRoot(dynamicTooltip[index]);
                         root.render(youtubeVideo);
+                      } else if (hotspot.url.includes("files")) {
+                        const youtubeVideo = (
+                          <>
+                            <div className="w-[15.6rem] text-center bg-black">
+                              {hotspot.hotspotDescription}
+                            </div>
+                            <iframe
+                              frameborder="0"
+                              scrolling="no"
+                              marginheight="0"
+                              marginwidth="0"
+                              width="250"
+                              height="140"
+                              type="text/html"
+                              src={hotspot.url}
+                            ></iframe>
+                          </>
+                        );
+                        const root = ReactDOM.createRoot(dynamicTooltip[index]);
+                        root.render(youtubeVideo, dynamicTooltip[index]);
                       } else {
                         const newImg = (
                           <div className="dynamic-tooltip-img-box">
@@ -346,20 +415,77 @@ function PanoramaPanillumUploadEdit({
                       </div>
                     ) : (
                       <div className="absolute -z-10  -top-32 -left-60 flex items-start flex-col gap-5">
-                        <div className="flex gap-4">
-                          <input
-                            type="text"
-                            name="link"
-                            onChange={(e) =>
-                              setInfoHotspotUrl((prev) => ({
-                                ...prev,
-                                url: e.target.value,
-                              }))
-                            }
-                          />
-                          <span className="whitespace-nowrap capitalize">
-                            youtube link
-                          </span>
+                         <div className="flex gap-4">
+                          {toggleUploadFilesType ? (
+                            <input
+                              type="text"
+                              name="link"
+                              onChange={(e) =>
+                                setInfoHotspotUrl((prev) => ({
+                                  ...prev,
+                                  url: e.target.value,
+                                }))
+                              }
+                            />
+                          ) : (
+                            <>
+                              <label className="flex" for="upload-file">
+                                <CloudUpload />
+                                {!!uploadToSanity && (
+                                  <div>
+                                    {uploadToSanity?.name?.slice(0, 16)}
+                                  </div>
+                                )}
+                              </label>
+                              {hotspotUploadSuccess && (
+                                <div className="text-green-800">
+                                  <Check />
+                                </div>
+                              )}
+                              <input
+                                type="file"
+                                id="upload-file"
+                                className="invisible"
+                                name="uploadFile"
+                                onChange={(e) =>
+                                  e.target.files.length > 0
+                                    ? setUploadToSanity(e.target.files[0])
+                                    : null
+                                }
+                              />
+                            </>
+                          )}
+                          {toggleUploadFilesType ? (
+                            <div
+                              onClick={() => setToggleUploadFilesType(false)}
+                            >
+                              <CloudUpload className="text-red-700 rounded-full  flex justify-center hover:text-red-400 transition-all " />
+                            </div>
+                          ) : (
+                            <div className="flex gap-4">
+                              <div
+                                onClick={() => {
+                                  setUploadToSanity([]);
+                                  sethotspotUploadSuccess(false);
+                                }}
+                                className=" hover:animate-bounce "
+                              >
+                                <Delete className="text-red-800 " />
+                              </div>
+                              <div
+                                className=" hover:animate-bounce"
+                                onClick={uploadHotspotFileToSanity}
+                              >
+                                {" "}
+                                <CloudUpload className="text-green-700  " />
+                              </div>
+                              <div
+                                onClick={() => setToggleUploadFilesType(true)}
+                              >
+                                <InsertLink className="text-green-600 rounded-full flex justify-center hover:text-blue-700 transition-all " />
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         <div className="flex gap-4">

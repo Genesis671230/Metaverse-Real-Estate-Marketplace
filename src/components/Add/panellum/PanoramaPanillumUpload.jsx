@@ -1,8 +1,12 @@
 import {
   ArrowCircleDown,
   BlurOn,
+  Check,
+  CloudUpload,
+  Delete,
   HelpOutline,
-  Hive
+  Hive,
+  InsertLink,
 } from "@mui/icons-material";
 import NavigationIcon from "@mui/icons-material/Navigation";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
@@ -10,9 +14,12 @@ import { motion } from "framer-motion";
 import { Pannellum } from "pannellum-react";
 import { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import CheckboxList from "./CheckboxList";
 import SelectedHotspotList from "./SelectedHotspotList";
+import { useSanity } from "../../../hooks/useSanity";
+import { Backdrop, CircularProgress } from "@mui/material";
+import { urlFor } from "../../../lib/utils";
 function PanoramaPanillumUpload({
   index,
   uploadImg,
@@ -23,38 +30,31 @@ function PanoramaPanillumUpload({
   setParanomaImageDataToSanity,
 }) {
   const [imgUrl, setImgUrl] = useState();
-  const [paranomaCheckbox, setParanomaCheckbox] = useState();
-  const [linkedHotpsotCounter, setLinkedHotpsotCounter] = useState();
-  const [singleHotspotLink, setSingleHotspotLink] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [uploadToSanity, setUploadToSanity] = useState();
   const [customHotspot, setCustomHotspot] = useState(true);
   const [infoHotspotUrl, setInfoHotspotUrl] = useState({});
+  const [paranomaCheckbox, setParanomaCheckbox] = useState();
+  const [singleHotspotLink, setSingleHotspotLink] = useState(0);
   const [infoHotspotImage, setInfoHotspotImage] = useState(null);
+  const [linkedHotpsotCounter, setLinkedHotpsotCounter] = useState();
+  const [hotspotUploadSuccess, sethotspotUploadSuccess] = useState(false);
+  const [toggleUploadFilesType, setToggleUploadFilesType] = useState(true);
 
+  const { uploadToGetLink } = useSanity();
   const PanRef = useRef();
   const hotRef = useRef();
   console.log(hotRef);
 
+  const num = paranomaImageDataToSanity?.filter((item) => item.id === index);
+  const getLength = num?.length;
+
   const currentDate = new Date();
   console.log(paranomaCheckbox, "goody");
 
-  useEffect(() => {
-    if (paranomaForUploading) {
-      const img = URL.createObjectURL(paranomaForUploading);
-      setImgUrl(img);
-    }
-  }, [paranomaForUploading]);
-
-  const num = paranomaImageDataToSanity?.filter((item) => item.id === index);
-
-  const getLength = num?.length;
-  useEffect(() => {
-    const specificItem = uploadImg.map(
-      (item, itemIndex) => itemIndex !== index && itemIndex
-    );
-
-    const filterFine = specificItem.filter((item) => typeof item == "number");
-    setLinkedHotpsotCounter(filterFine);
-  }, [uploadImg]);
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const notify = () =>
     toast.success("Hotspot added!", {
@@ -67,10 +67,63 @@ function PanoramaPanillumUpload({
       progress: undefined,
     });
 
-  
-    
+  const uploadHotspotFileToSanity = async () => {
+    try {
+      setOpen(true);
+      const uploadedFile = await uploadToGetLink(uploadToSanity);
+
+      if (uploadedFile._type === "hotspotImages") {
+        setInfoHotspotUrl((prev) => ({
+          ...prev,
+          url: urlFor(uploadedFile?.image)?.url(),
+        }));
+        sethotspotUploadSuccess(true);
+      }
+
+      if (uploadedFile._type === "hotspotVideos") {
+        setInfoHotspotUrl((prev) => ({
+          ...prev,
+          url: uploadedFile?.url,
+        }));
+        sethotspotUploadSuccess(true);
+      }
+
+      setOpen(false);
+      setUploadToSanity([]);
+    } catch (error) {
+      console.log(error);
+      setOpen(false);
+      setUploadToSanity([]);
+    }
+  };
+  console.log(infoHotspotUrl);
+
+  useEffect(() => {
+    if (paranomaForUploading) {
+      const img = URL.createObjectURL(paranomaForUploading);
+      setImgUrl(img);
+    }
+  }, [paranomaForUploading]);
+
+  useEffect(() => {
+    const specificItem = uploadImg.map(
+      (item, itemIndex) => itemIndex !== index && itemIndex
+    );
+
+    const filterFine = specificItem.filter((item) => typeof item == "number");
+    setLinkedHotpsotCounter(filterFine);
+  }, [uploadImg]);
+
   return (
     <div>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={open}
+        onClick={handleClose}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -102,9 +155,8 @@ function PanoramaPanillumUpload({
               compass={true}
               sceneFadeDuration={100}
               onLoad={() => console.log("panorama loaded")}
-            
             >
-              {num.map((hotspot,index) => {
+              {num.map((hotspot, index) => {
                 if (hotspot.type === "customHotspot") {
                   return (
                     <Pannellum.Hotspot
@@ -122,25 +174,25 @@ function PanoramaPanillumUpload({
                 }
 
                 if (hotspot.type === "infoHotspot") {
-
                   const dynamicTooltip =
-                  document.getElementsByClassName("pnlm-pointer");
+                    document.getElementsByClassName("pnlm-pointer");
 
-                    console.log(dynamicTooltip);
+                  console.log(dynamicTooltip);
 
-                    const renderTooltips = () => {
-                      if(dynamicTooltip.length){
+                  const renderTooltips = () => {
+                    if (dynamicTooltip.length) {
+                      const urlPattern =
+                        /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})?$/;
 
-                        const urlPattern =
-                          /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})?$/;
-      
-                        const validVideoUrl = urlPattern.test(hotspot.url);
-      
-                        if (validVideoUrl) {
-                          const youtubeVideoId = hotspot.url.split("=")[1];
-                          const youtubeVideo = (
-                            <>
-                             <div className="w-[15.6rem] text-center bg-black">{hotspot.hotspotDescription}</div>
+                      const validVideoUrl = urlPattern.test(hotspot.url);
+                      console.log(hotspot);
+                      if (validVideoUrl) {
+                        const youtubeVideoId = hotspot.url.split("=")[1];
+                        const youtubeVideo = (
+                          <>
+                            <div className="w-[15.6rem] text-center bg-black">
+                              {hotspot.hotspotDescription}
+                            </div>
                             <iframe
                               frameborder="0"
                               scrolling="no"
@@ -150,40 +202,54 @@ function PanoramaPanillumUpload({
                               height="140"
                               type="text/html"
                               src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=0&fs=0&iv_load_policy=3&showinfo=0&rel=0&cc_load_policy=0&start=0&end=0&origin=http://youtubeembedcode.com`}
-                              ></iframe>
-                           
-                              </> 
-                          );
-                          const root = ReactDOM.createRoot(dynamicTooltip[index]);
-                           root.render(youtubeVideo, dynamicTooltip[index]);
-                        } else {
-                          const newImg = (
-                            <div
-                            className="dynamic-tooltip-img-box"
-                            >
-      
+                            ></iframe>
+                          </>
+                        );
+                        const root = ReactDOM.createRoot(dynamicTooltip[index]);
+                        root.render(youtubeVideo, dynamicTooltip[index]);
+                      } else if (hotspot.url.includes("files")) {
+                        const youtubeVideo = (
+                          <>
+                            <div className="w-[15.6rem] text-center bg-black">
+                              {hotspot.hotspotDescription}
+                            </div>
+                            <iframe
+                              frameborder="0"
+                              scrolling="no"
+                              marginheight="0"
+                              marginwidth="0"
+                              width="250"
+                              height="140"
+                              type="text/html"
+                              src={hotspot.url}
+                            ></iframe>
+                          </>
+                        );
+                        const root = ReactDOM.createRoot(dynamicTooltip[index]);
+                        root.render(youtubeVideo, dynamicTooltip[index]);
+                      } else {
+                        const newImg = (
+                          <div className="dynamic-tooltip-img-box">
                             <img
                               src={hotspot.url}
                               width={200}
                               objectFit="contain"
                               className="dynamic-tooltip-img"
-                              />
-                              <span>{hotspot.hotspotDescription}</span>
-                              </div>
-                          );
-                          const root = ReactDOM.createRoot(dynamicTooltip[index]);
-                          root.render(newImg, dynamicTooltip[index]);
+                            />
+                            <span>{hotspot.hotspotDescription}</span>
+                          </div>
+                        );
+                        const root = ReactDOM.createRoot(dynamicTooltip[index]);
+                        root.render(newImg, dynamicTooltip[index]);
                       }
-                        }
-      
                     }
+                  };
 
-                    setTimeout(() => {
-                      renderTooltips()
-                    }, 3000);
-                
+                  setTimeout(() => {
+                    renderTooltips();
+                  }, 3000);
+
                   return (
-
                     <Pannellum.Hotspot
                       type="info"
                       pitch={hotspot.pitch}
@@ -191,9 +257,7 @@ function PanoramaPanillumUpload({
                       text={hotspot.url}
                       cssClass="cssCustomArrow"
                       URL={hotspot.url}
-                      />
-
-
+                    />
                   );
                 }
               })}
@@ -288,8 +352,6 @@ function PanoramaPanillumUpload({
                   {!!paranomaCheckbox && customHotspot ? (
                     <div
                       onClick={() => {
-                        // if (getLength === uploadImg?.length - 1) return;
-
                         setParanomaImageDataToSanity((prev) => [
                           ...prev,
                           {
@@ -315,7 +377,8 @@ function PanoramaPanillumUpload({
                             ...paranomaCheckbox,
                             type: "infoHotspot",
                             url: infoHotspotUrl.url,
-                            hotspotDescription: infoHotspotUrl.hotspotDescription
+                            hotspotDescription:
+                              infoHotspotUrl.hotspotDescription,
                           },
                         ]);
                         notify();
@@ -340,22 +403,91 @@ function PanoramaPanillumUpload({
                     ) : (
                       <div className="absolute -z-10  -top-32 -left-60 flex items-start flex-col gap-5">
                         <div className="flex gap-4">
-                        <input
-                          type="text"
-                          name="link"
-                          onChange={(e) => setInfoHotspotUrl((prev)=>({...prev,url:e.target.value}))}
-                          />
-                          <span className="whitespace-nowrap capitalize">youtube link</span>
-                          </div>
+                          {toggleUploadFilesType ? (
+                            <input
+                              type="text"
+                              name="link"
+                              onChange={(e) =>
+                                setInfoHotspotUrl((prev) => ({
+                                  ...prev,
+                                  url: e.target.value,
+                                }))
+                              }
+                            />
+                          ) : (
+                            <>
+                              <label className="flex" for="upload-file">
+                                <CloudUpload />
+                                {!!uploadToSanity && (
+                                  <div>
+                                    {uploadToSanity?.name?.slice(0, 16)}
+                                  </div>
+                                )}
+                              </label>
+                              {hotspotUploadSuccess && (
+                                <div className="text-green-800">
+                                  <Check />
+                                </div>
+                              )}
+                              <input
+                                type="file"
+                                id="upload-file"
+                                className="invisible"
+                                name="uploadFile"
+                                onChange={(e) =>
+                                  e.target.files.length > 0
+                                    ? setUploadToSanity(e.target.files[0])
+                                    : null
+                                }
+                              />
+                            </>
+                          )}
+                          {toggleUploadFilesType ? (
+                            <div
+                              onClick={() => setToggleUploadFilesType(false)}
+                            >
+                              <CloudUpload className="text-red-700 rounded-full  flex justify-center hover:text-red-400 transition-all " />
+                            </div>
+                          ) : (
+                            <div className="flex gap-4">
+                              <div
+                                onClick={() => {
+                                  setUploadToSanity([]);
+                                  sethotspotUploadSuccess(false);
+                                }}
+                                className=" hover:animate-bounce "
+                              >
+                                <Delete className="text-red-800 " />
+                              </div>
+                              <div
+                                className=" hover:animate-bounce"
+                                onClick={uploadHotspotFileToSanity}
+                              >
+                                {" "}
+                                <CloudUpload className="text-green-700  " />
+                              </div>
+                              <div
+                                onClick={() => setToggleUploadFilesType(true)}
+                              >
+                                <InsertLink className="text-green-600 rounded-full flex justify-center hover:text-blue-700 transition-all " />
+                              </div>
+                            </div>
+                          )}
+                        </div>
 
-                          <div className="flex gap-4" >
-                        <input
-                          type="text"
-                          name="hotspotDescription"
-                          onChange={(e) => setInfoHotspotUrl((prev)=>({...prev,hotspotDescription:e.target.value}))}
+                        <div className="flex gap-4">
+                          <input
+                            type="text"
+                            name="hotspotDescription"
+                            onChange={(e) =>
+                              setInfoHotspotUrl((prev) => ({
+                                ...prev,
+                                hotspotDescription: e.target.value,
+                              }))
+                            }
                           />
                           <span className="capitalize">Description</span>
-                          </div>
+                        </div>
                       </div>
                     )}
                   </>

@@ -9,7 +9,8 @@ function Room2({ itemData,snImg }) {
   const [imgFront, setImgFront] = useState();
   useEffect(() => {
     if (itemData) {
-      const res = itemData.image[0]?.image;
+      console.log(itemData);
+      const res = itemData?.image[0]?.image;
       setImgFront(res);
     }
   }, []);

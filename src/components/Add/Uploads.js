@@ -87,8 +87,8 @@ function Uploads() {
               setUploadedImagesLinks((prev) => [...prev, waitToGetUrl]);
             }
 
-            setOpen(false);
           }
+          setOpen(false);
           setuploadImg([]);
         };
         await runFunEach();
