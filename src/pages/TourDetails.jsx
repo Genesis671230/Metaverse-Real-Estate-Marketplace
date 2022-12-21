@@ -23,7 +23,6 @@ const TourDetails = () => {
       setCatchSnImg(urlFor(location.state?.itemData.image[0].image).url());
     }
   }, []);
-  console.log(tourDetails && tourDetails, "");
 
   const initialViewState = {
     latitude: Number(
@@ -53,13 +52,12 @@ const TourDetails = () => {
             <div className="md:text-[2rem] w-[50%] tracking-wide ml-10">
               <h6>{tourDetails?.description}</h6>
             </div>
-            {data?.map((item) => {
+            {data?.map((item,index) => {
               if(( typeof(item[1]) !== "string" || item[0] === "uid") ){
                 return;
               }
-              console.log(item);
               return (
-                <div className="text-[2rem] mt-20 capitalize w-[50%] tracking-wide ml-10">
+                <div key={index} className="text-[2rem] mt-20 capitalize w-[50%] tracking-wide ml-10">
                   <div className="tracking-normal border-b-2 border-neutral-400 border- ">
                         {item[0]} 
                   </div>
