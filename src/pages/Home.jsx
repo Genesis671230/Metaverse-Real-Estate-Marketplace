@@ -32,9 +32,9 @@ function Home() {
       {fetchedData && (
         <>
           <Hero />
-          <div className="md:mx-36 overflow-hidden">
+          {/* <div className="md:mx-36 overflow-hidden">
             <Deals />
-          </div>
+          </div> */}
           <Rooms fetchedData={fetchedData} />
           <div className="md:mx-36 overflow-hidden">
             <Services />
