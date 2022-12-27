@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+
+
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -14,6 +16,11 @@ module.exports = {
         "nature-light": "url('/nature-light.jpg')",
         "nature-dark": "url('/nature-dark.jpg')",
       },
+      fontFamily:{
+        unbounded: ["Unbounded", "cursive"],
+        anton:['Anton', 'sans-serif'],
+        hanken:['Hanken Grotesk', 'sans-serif']
+      }
     },
   },
   plugins: [],

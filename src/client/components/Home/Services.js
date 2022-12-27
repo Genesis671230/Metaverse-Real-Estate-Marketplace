@@ -2,7 +2,7 @@ import React from 'react'
 
 function Services() {
   return (
-    <div className='w-full pt-12 ' >
+    <div  className='w-full pt-12 ' >
       <div className='border-b  md:w-96 border-temp-border-gray py-3' >
         <span className='text-4xl font-bold text-temp-gray' >OUR CATEGORIES</span>
       </div>
